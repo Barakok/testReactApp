@@ -1,10 +1,13 @@
 'use client';
-import { Button } from 'react-bootstrap';
-
-export default function DatePickerCustom() {
+import { Button } from 'antd';
+const CustomButton = ({ text, type }) => {
   return (
     <>
-      <Button variant="primary">Кнопка</Button>
+      <Button variant="primary" htmlType={type}>
+        {text}
+      </Button>
     </>
   );
-}
+};
+
+export default CustomButton;

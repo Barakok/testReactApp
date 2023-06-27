@@ -1,11 +1,9 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import CustomButton from '@/components/CustomButton';
-import styles from './page.module.css';
+import MainForm from './MainForm.js';
 
 export default function Page() {
   return (
-    <main className={styles.main}>
-      <CustomButton />
+    <main style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+      <MainForm />
     </main>
   );
 }
