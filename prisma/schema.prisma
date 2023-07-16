@@ -6,6 +6,7 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
 enum Gender {
   Male
   Female
@@ -25,22 +26,21 @@ enum Goal {
   WeightMaintenance
 }
 
-model LifestyleCoefficient{
-  id        Int       @id @default(autoincrement())
-  type Lifestyle @unique
+model LifestyleCoefficient {
+  id          Int       @id @default(autoincrement())
+  type        Lifestyle @unique
+  name        String?
   coefficient Float
-  users User[]
+  users       User[]
 }
+
 model User {
-  id        Int       @id @default(autoincrement())
-  gender    Gender
-  height    Int
-  weight    Int
-  age       Int
-  goal      Goal
+  id                   Int                  @id @default(autoincrement())
+  gender               Gender
+  height               Int
+  weight               Int
+  age                  Int
+  goal                 Goal
   lifestyleCoefficient LifestyleCoefficient @relation(fields: [lifestyleId], references: [id])
-  lifestyleId Int
+  lifestyleId          Int
 }
-
-
-
