@@ -1,6 +1,6 @@
 'use client';
 import { Row, Col, Input, Radio, Select } from 'antd';
-import CustomButton from '@/components/CustomButton';
+import CustomButton from '../components/CustomButton';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
