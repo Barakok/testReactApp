@@ -34,13 +34,24 @@ model LifestyleCoefficient {
   users       User[]
 }
 
+model GoalCoefficient {
+  id            Int       @id @default(autoincrement())
+  type          Goal @unique
+  name          String?
+  proteins      Float
+  fats          Float
+  carbohydrates Float
+  users         User[]
+}
+
 model User {
   id                   Int                  @id @default(autoincrement())
-  gender               Gender
   height               Int
   weight               Int
   age                  Int
-  goal                 Goal
+  gender               Gender
+  goalCoefficient      GoalCoefficient @relation(fields: [goalId], references: [id])
   lifestyleCoefficient LifestyleCoefficient @relation(fields: [lifestyleId], references: [id])
   lifestyleId          Int
+  goalId               Int
 }

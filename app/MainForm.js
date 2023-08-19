@@ -1,10 +1,12 @@
 'use client';
-import { Row, Col, Input, Radio, Select } from 'antd';
+import { Row, Col, Input, Radio, Select, Form } from 'antd';
 import CustomButton from '../components/CustomButton';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import style from './style.module.css';
+import {useEffect, useState} from 'react';
+
 
 const schema = yup
   .object({
@@ -37,11 +39,56 @@ const MainForm = ({ lifestyle }) => {
     handleSubmit,
     control,
     formState: { errors },
+    getValues,
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
   });
 
+
+const formWatch = watch()
+  // const [formData, setFormData] = useState({
+    //     gender: '',
+    //     height: '',
+    //     weight: '',
+    //     age: '',
+    //     goal: '',
+    //     lifestyle: '',
+    //     formulaType: '',
+    // });
+    const [serverResponse, setServerResponse] = useState(null);
+    useEffect(()=>{
+        onSubmit(formWatch).then((res)=>{
+            setServerResponse(res)
+        })
+
+     console.log("Result", formWatch)
+    }, [formWatch])
+
+    const handleFieldChange = (fieldName, fieldValue) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [fieldName]: fieldValue,
+        }));
+        handleFormChange(formData)
+    };
+const validate = (data) => {
+    try{
+
+    }
+    catch (error){
+
+    }
+}
   const onSubmit = async (data) => {
+      console.log("Gender", data)
+      const formData = getValues()
+      const res = await schema.isValid(formData)
+      console.log("Data", res)
+      if(!res){
+          return
+      }
+      // setFormData(data)
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
@@ -54,17 +101,47 @@ const MainForm = ({ lifestyle }) => {
       if (response.ok) {
         const r = await response.json();
         console.log('По формуле Миффлина-Сан Жеора: ', r);
+        setServerResponse(r);
       } else {
         console.error('Ошибка при сохранении пользователя.');
       }
     } catch (error) {
-      console.error('Ошибка при сохранении пользователя:', error);
+      console.error('ошибка отправки пользователя:', error);
     }
   };
 
-  const onSubmit2 = async () => {};
+ const sr = (values) => {
+     console.log("IS", values)
+ }
+    const handleFormChange = async (formData) => {
+
+        if (serverResponse) {
+            setServerResponse(null);
+        }
+
+        try {
+            const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                const r = await response.json();
+                console.log('По формуле Миффлина-Сан Жеора: ', r);
+                setServerResponse(r);
+            } else {
+                console.error('Ошибка при сохранении пользователя.');
+            }
+        } catch (error) {
+            console.error('Ошибка при сохранении пользователя:', error);
+        }
+    };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form onFinish={handleSubmit(onSubmit)}>
       <Row className={style.formRow}>
         <Col>
           <label htmlFor="gender">Пол</label>
@@ -73,7 +150,11 @@ const MainForm = ({ lifestyle }) => {
             name="gender"
             render={({ field: { onChange, onBlur, value, ref } }) => (
               <Select
-                onChange={onChange}
+                  onChange={onChange}
+                  // onChange={(newValue) => {
+                  //    onChange(newValue)
+                  //     handleFieldChange('gender', newValue);
+                  // }}
                 onBlur={onBlur}
                 value={value}
                 id="gender"
@@ -187,12 +268,43 @@ const MainForm = ({ lifestyle }) => {
         </Col>
       </Row>
 
+        <Row className={style.formRow}>
+            <Col>
+                <label htmlFor="formulaType">По формуле</label>
+                <Controller
+                    control={control}
+                    name="formulaType"
+                    render={({ field: { onChange, onBlur, value, ref } }) => (
+                        <Radio.Group onChange={onChange} value={value}>
+                            <Radio.Button value="MifflinSanJeor">Миффлина-Сан Жеора</Radio.Button>
+                            <Radio.Button value="HarrisBenedict">Харриса-Бенедикта</Radio.Button>
+                        </Radio.Group>
+                    )}
+                />
+                {errors.formulaType && <p>{errors.formulaType.message}</p>}
+            </Col>
+        </Row>
+
       <Row className={style.formRow}>
         <Col>
           <CustomButton text="Отправить" type="submit" />
         </Col>
       </Row>
-    </form>
+
+
+        {serverResponse && (
+            <Row className={style.formRow}>
+                <Col>
+                    <p>
+                        Суточная норма калорий: {serverResponse.bmrResult}<br />
+                        Суточная норма белка: {serverResponse.normaNutrientPerDay.proteins} грамм<br />
+                        Суточная норма жиров: {serverResponse.normaNutrientPerDay.fats} грамм<br />
+                        Суточная норма углеводов: {serverResponse.normaNutrientPerDay.carbohydrates} грамм
+                    </p>
+                </Col>
+            </Row>
+        )}
+    </Form>
   );
 };
 
